@@ -23,65 +23,72 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class GreetingController {
-    /**session操作类*/
+    /**
+     * session操作类
+     */
     @Autowired
     SocketSessionRegistry webAgentSessionRegistry;
-    /**消息发送工具*/
+    /**
+     * 消息发送工具
+     */
     @Autowired
     private SimpMessagingTemplate template;
 
     @RequestMapping(value = "/index")
-    public  String index(){
+    public String index() {
         return "/index";
     }
+
     @RequestMapping(value = "/msg/message")
-    public  String ToMessage(){
+    public String toMessage() {
         return "/message";
     }
+
     @RequestMapping(value = "/msg/messaget2")
-    public  String ToMessaget2(){
+    public String toMessaget2() {
         return "/messaget2";
     }
 
     /**
      * 用户广播
      * 发送消息广播  用于内部发送使用
+     *
      * @param request
      * @return
      */
     @GetMapping(value = "/msg/sendcommuser")
-    public  @ResponseBody
-    OutMessage SendToCommUserMessage(HttpServletRequest request){
-        List<String> keys=webAgentSessionRegistry.getAllSessionIds().entrySet()
+    public @ResponseBody
+    OutMessage sendToCommUserMessage(HttpServletRequest request) {
+        List<String> keys = webAgentSessionRegistry.getAllSessionIds().entrySet()
                 .stream().map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-        Date date=new Date();
-        keys.forEach(x->{
-            String sessionId=webAgentSessionRegistry.getSessionIds(x).stream().findFirst().get().toString();
-            template.convertAndSendToUser(sessionId,"/topic/greetings",new OutMessage("commmsg：allsend, " + "send  comm" +date.getTime()+ "!"),createHeaders(sessionId));
+        Date date = new Date();
+        keys.forEach(x -> {
+            String sessionId = webAgentSessionRegistry.getSessionIds(x).stream().findFirst().get().toString();
+            template.convertAndSendToUser(sessionId, "/topic/greetings", new OutMessage("commmsg：allsend, " + "send  comm" + date.getTime() + "!"), createHeaders(sessionId));
 
         });
-         return new OutMessage("sendcommuser, " + new Date() + "!");
+        return new OutMessage("sendcommuser, " + new Date() + "!");
     }
-
-
 
 
     /**
      * 同样的发送消息   只不过是ws版本  http请求不能访问
      * 根据用户key发送消息
+     *
      * @param message
      * @return
      * @throws Exception
      */
     @MessageMapping("/msg/hellosingle")
     public void greeting2(InMessage message) throws Exception {
-        Map<String,String> params = new HashMap(1);
-        params.put("test","test");
+        Map<String, String> params = new HashMap(1);
+        params.put("test", "test");
         //这里没做校验
-        String sessionId=webAgentSessionRegistry.getSessionIds(message.getId()).stream().findFirst().get();
-        template.convertAndSendToUser(sessionId,"/topic/greetings",new OutMessage("single send to："+message.getId()+", from:" + message.getName() + "!"),createHeaders(sessionId));
+        String sessionId = webAgentSessionRegistry.getSessionIds(message.getId()).stream().findFirst().get();
+        template.convertAndSendToUser(sessionId, "/topic/greetings", new OutMessage("single send to：" + message.getId() + ", from:" + message.getName() + "!"), createHeaders(sessionId));
     }
+
     private MessageHeaders createHeaders(String sessionId) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         headerAccessor.setSessionId(sessionId);

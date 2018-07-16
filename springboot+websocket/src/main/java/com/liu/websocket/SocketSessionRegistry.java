@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * 用户session记录类
  */
-public class SocketSessionRegistry{
+public class SocketSessionRegistry {
     //这个集合存储session
     private final ConcurrentMap<String, Set<String>> userSessionIds = new ConcurrentHashMap();
     private final Object lock = new Object();
@@ -20,18 +20,19 @@ public class SocketSessionRegistry{
     }
 
     /**
-     *
      * 获取sessionId
+     *
      * @param user
      * @return
      */
     public Set<String> getSessionIds(String user) {
-        Set set = (Set)this.userSessionIds.get(user);
-        return set != null?set: Collections.emptySet();
+        Set set = (Set) this.userSessionIds.get(user);
+        return set != null ? set : Collections.emptySet();
     }
 
     /**
      * 获取所有session
+     *
      * @return
      */
     public ConcurrentMap<String, Set<String>> getAllSessionIds() {
@@ -40,6 +41,7 @@ public class SocketSessionRegistry{
 
     /**
      * register session
+     *
      * @param user
      * @param sessionId
      */
@@ -47,14 +49,14 @@ public class SocketSessionRegistry{
         Assert.notNull(user, "User must not be null");
         Assert.notNull(sessionId, "Session ID must not be null");
         Object var3 = this.lock;
-        synchronized(this.lock) {
-            Object set = (Set)this.userSessionIds.get(user);
-            if(set == null) {
+        synchronized (this.lock) {
+            Object set = (Set) this.userSessionIds.get(user);
+            if (set == null) {
                 set = new CopyOnWriteArraySet();
                 this.userSessionIds.put(user, (Set<String>) set);
             }
 
-            ((Set)set).add(sessionId);
+            ((Set) set).add(sessionId);
         }
     }
 
@@ -62,9 +64,9 @@ public class SocketSessionRegistry{
         Assert.notNull(userName, "User Name must not be null");
         Assert.notNull(sessionId, "Session ID must not be null");
         Object var3 = this.lock;
-        synchronized(this.lock) {
-            Set set = (Set)this.userSessionIds.get(userName);
-            if(set != null && set.remove(sessionId) && set.isEmpty()) {
+        synchronized (this.lock) {
+            Set set = (Set) this.userSessionIds.get(userName);
+            if (set != null && set.remove(sessionId) && set.isEmpty()) {
                 this.userSessionIds.remove(userName);
             }
 

@@ -16,7 +16,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");// /users 默认通知
+        // /users 默认通知
+        config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
         //设置前缀  默认是user 可以修改  点对点时使用
         config.setUserDestinationPrefix("/ricky/");
@@ -24,16 +25,17 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-            registry.addEndpoint("/ricky-websocket").withSockJS();
+        registry.addEndpoint("/ricky-websocket").withSockJS();
     }
 
 
     @Bean
-    public SocketSessionRegistry SocketSessionRegistry(){
+    public SocketSessionRegistry socketSessionRegistry() {
         return new SocketSessionRegistry();
     }
+
     @Bean
-    public STOMPConnectEventListener STOMPConnectEventListener(){
+    public STOMPConnectEventListener sTOMPConnectEventListener() {
         return new STOMPConnectEventListener();
     }
 }
